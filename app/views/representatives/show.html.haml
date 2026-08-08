@@ -1,4 +1,24 @@
-.container-fluid.bg-light
-  .row.text-center
-    .col-12
-      %h1.text-center= @representative&.name
+.container.py-4
+  .row.justify-content-center
+    .col-md-8
+      %h1= @representative.name
+      .card
+        - if @representative.photo_url.present?
+          = image_tag @representative.photo_url, alt: "Portrait of #{@representative.name}", class: 'card-img-top representative-photo'
+        .card-body
+          %dl.row.mb-0
+            %dt.col-sm-4 Office
+            %dd.col-sm-8= @representative.title.presence || 'Not available'
+            %dt.col-sm-4 Party
+            %dd.col-sm-8= @representative.party.presence || 'Not available'
+            %dt.col-sm-4 Address
+            %dd.col-sm-8= @representative.address.presence || 'Not available'
+            %dt.col-sm-4 Phone
+            %dd.col-sm-8= @representative.phone_number.presence || 'Not available'
+            %dt.col-sm-4 Website
+            %dd.col-sm-8
+              - if @representative.website_url.present?
+                = link_to @representative.website_url, @representative.website_url, rel: 'noopener', target: '_blank'
+              - else
+                Not available
+          = link_to 'View news articles', representative_news_items_path(@representative), class: 'btn btn-primary mt-3'

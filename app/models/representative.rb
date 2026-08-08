@@ -35,29 +35,32 @@ class Representative < ApplicationRecord
     @legislators = fields['congressional_districts'][0]['current_legislators']
 
     @legislators.each_with_index do |official, _index|
-      official['name'] = "#{official.dig('bio', 'first_name')} #{official.dig('bio', 'last_name')}"
+      official['name'] = [official.dig('bio', 'first_name'), official.dig('bio', 'last_name')].compact.join(' ')
       title = official['type']
       # Inspect all the data that's there to make part 1 easier.
       # Rails.logger.debug official
       # official.dig('bio', 'party')
-      ocdid = official['govtrack_id']
+      ocdid = official.dig('references', 'govtrack_id') || official['govtrack_id']
       reps << Representative.find_rep(official, ocdid: ocdid, title: title)
     end
     reps
   end
 
   def self.find_rep(official, title: '', ocdid: '')
-    rep = Representative.create({ name: official['name'], ocdid: ocdid,
-      title: title, party: official['party'], photo_url: official['photo_url'] })
-    rep.save
+    rep = ocdid.present? ? Representative.find_or_initialize_by(ocdid: ocdid) : Representative.new
+    rep.name = official['name'] if official['name'].present?
+    rep.title = title
+    rep.update_from_geocodio(official)
   end
 
   def update_from_geocodio(official)
-    self.title = official['type']
-    self.ocdid = official['govtrack_id']
-    self.party = official['party']
-    self.photo_url = official['photo_url']
-    # TODO: store the address, phone and website
+    self.title = official['type'] if official['type'].present?
+    self.ocdid = official.dig('references', 'govtrack_id') || official['govtrack_id'] if ocdid.blank?
+    self.party = official.dig('bio', 'party') || official['party']
+    self.address = official.dig('contact', 'address') || official['address']
+    self.phone_number = official.dig('contact', 'phone') || official['phone']
+    self.website_url = official.dig('contact', 'url') || official['website_url']
+    self.photo_url = official.dig('bio', 'photo_url') || official['photo_url']
     save!
     self
   end

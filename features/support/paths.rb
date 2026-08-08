@@ -21,6 +21,12 @@ module NavigationHelpers
     when /^the state page for "(\w\w)"$/
       "/state/#{$1}"
 
+    when /^the state map page for "(\w\w)"$/
+      "/state/#{$1}"
+
+    when /^the county map page for "(\w\w)" and FIPS code "(\d+)"$/
+      "/state/#{$1}/county/#{$2}"
+
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #

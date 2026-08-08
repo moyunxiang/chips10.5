@@ -13,6 +13,7 @@ class MapController < ApplicationController
     handle_state_not_found && return if @state.nil?
 
     @county_details = @state.counties.index_by(&:std_fips_code)
+    @representatives = representatives_for_county
   end
 
   # Render the map of a specific county.
@@ -44,5 +45,14 @@ class MapController < ApplicationController
     County.find_by(
       state: state_id, fips_code: params[:std_fips_code].to_i(10)
     )
+  end
+
+  def representatives_for_county
+    Representative.civic_api_to_representative_params(
+      Representative.geocodio_search("#{@county.name} County, #{@state.symbol}")
+    )
+  rescue ArgumentError => e
+    Rails.logger.warn("Unable to load representatives for county: #{e.message}")
+    []
   end
 end
