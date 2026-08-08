@@ -18,7 +18,7 @@ class Representative < ApplicationRecord
   # https://www.geocod.io/docs/#congressional-districts
   def self.geocodio_search(query)
     geocodio_api_key = ENV.fetch('GEOCODIO_API_KEY', Rails.application.credentials[:GEOCODIO_API_KEY])
-    raise ArgumentError 'Missing GEOCODIO_API_KEY' if geocodio_api_key.blank?
+    raise ArgumentError, 'Missing GEOCODIO_API_KEY' if geocodio_api_key.blank?
 
     geocodio = Geocodio::Gem.new(geocodio_api_key)
     geocodio.geocode(query, ['cd'])
@@ -55,13 +55,20 @@ class Representative < ApplicationRecord
 
   def update_from_geocodio(official)
     self.title = official['type'] if official['type'].present?
-    self.ocdid = official.dig('references', 'govtrack_id') || official['govtrack_id'] if ocdid.blank?
-    self.party = official.dig('bio', 'party') || official['party']
-    self.address = official.dig('contact', 'address') || official['address']
-    self.phone_number = official.dig('contact', 'phone') || official['phone']
-    self.website_url = official.dig('contact', 'url') || official['website_url']
-    self.photo_url = official.dig('bio', 'photo_url') || official['photo_url']
+    self.ocdid = pick(official, %w[references govtrack_id], 'govtrack_id') if ocdid.blank?
+    self.party = pick(official, %w[bio party], 'party')
+    self.address = pick(official, %w[contact address], 'address')
+    self.phone_number = pick(official, %w[contact phone], 'phone')
+    self.website_url = pick(official, %w[contact url], 'website_url')
+    self.photo_url = pick(official, %w[bio photo_url], 'photo_url')
     save!
     self
+  end
+
+  private
+
+  # Read a nested value from the Geocodio hash, falling back to a top-level key.
+  def pick(official, dig_path, fallback_key)
+    official.dig(*dig_path) || official[fallback_key]
   end
 end

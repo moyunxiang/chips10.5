@@ -1,7 +1,7 @@
 .row
   .col-12
     %section.my-4
-      %h2.text-center
+      %h1.text-center
         #{@county.name}, #{@state.symbol}
       .text-center.mb-3
         = link_to "Back to #{@state.name} map", state_map_path(@state.symbol), class: 'btn btn-outline-primary'
@@ -17,7 +17,7 @@
 
 .row
   .col-12.col-md-10.offset-md-1
-    %h3 Representatives for #{@county.name} County
+    %h2 Representatives for #{@county.name} County
     = render 'representatives/table', representatives: @representatives
 
 .d-none#actionmap-info-container{

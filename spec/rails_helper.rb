@@ -15,6 +15,8 @@ end
 SimpleCov.start 'rails' do
   command_name 'rspec'
 
+  add_filter 'lib' # CS169: Task 1.4: exclude library code from coverage
+
   ## CS169: You may want to modify some of the testing configuration.
 
   # This only shows the more verbose console output on GitHub

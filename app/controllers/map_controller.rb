@@ -13,7 +13,6 @@ class MapController < ApplicationController
     handle_state_not_found && return if @state.nil?
 
     @county_details = @state.counties.index_by(&:std_fips_code)
-    @representatives = representatives_for_county
   end
 
   # Render the map of a specific county.
@@ -25,6 +24,7 @@ class MapController < ApplicationController
     handle_county_not_found && return if @county.nil?
 
     @county_details = @state.counties.index_by(&:std_fips_code)
+    @representatives = representatives_for_county
   end
 
   private

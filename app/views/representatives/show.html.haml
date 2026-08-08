@@ -4,7 +4,8 @@
       %h1= @representative.name
       .card
         - if @representative.photo_url.present?
-          = image_tag @representative.photo_url, alt: "Portrait of #{@representative.name}", class: 'card-img-top representative-photo'
+          - alt_text = "Portrait of #{@representative.name}"
+          = image_tag @representative.photo_url, alt: alt_text, class: 'card-img-top representative-photo'
         .card-body
           %dl.row.mb-0
             %dt.col-sm-4 Office

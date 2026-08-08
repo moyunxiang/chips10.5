@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe RepresentativesController do
   describe 'GET show' do
-    it 'loads the requested representative profile' do
-      representative = Representative.create!(
+    let(:representative) do
+      Representative.create!(
         name: 'Ada Lovelace',
         ocdid: '12345',
         title: 'Representative',
@@ -15,7 +15,9 @@ RSpec.describe RepresentativesController do
         website_url: 'https://example.test',
         photo_url: 'https://example.test/ada.jpg'
       )
+    end
 
+    it 'loads the requested representative profile' do
       get :show, params: { id: representative.id }
 
       expect(response).to be_successful

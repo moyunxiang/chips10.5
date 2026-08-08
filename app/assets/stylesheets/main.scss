@@ -42,6 +42,15 @@ nav.navbar .bg-primary-active {
     white-space: nowrap;
 }
 
+// Darken primary links/buttons so their text meets the WCAG AA 4.5:1
+// contrast ratio on light backgrounds (fixes axe color-contrast on the map pages).
+.btn-link,
+.btn-outline-primary {
+  --bs-btn-color: #0a4fbf;
+  --bs-btn-hover-color: #083a8c;
+  color: #0a4fbf;
+}
+
 .field_with_errors {
     color: red;
 }

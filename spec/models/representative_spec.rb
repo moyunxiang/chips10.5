@@ -44,4 +44,28 @@ RSpec.describe Representative do
       expect(rep).to have_attributes(name: 'Ada Lovelace', party: 'Independent', phone_number: '555-0100')
     end
   end
+
+  describe '.civic_api_to_representative_params' do
+    let(:geocodio_response) do
+      legislator = {
+        'type' => 'representative',
+        'bio' => { 'first_name' => 'Ada', 'last_name' => 'Lovelace', 'party' => 'Independent' },
+        'contact' => { 'address' => '1 Main Street', 'phone' => '555-0100', 'url' => 'https://example.test' },
+        'references' => { 'govtrack_id' => '412345' }
+      }
+      { 'results' => [{ 'response' => { 'results' => [{ 'fields' => {
+        'congressional_districts' => [{ 'current_legislators' => [legislator] }]
+      } }] } }] }
+    end
+
+    it 'builds a representative from a geocodio response' do
+      reps = described_class.civic_api_to_representative_params(geocodio_response)
+      expect(reps.first).to have_attributes(name: 'Ada Lovelace', party: 'Independent')
+    end
+
+    it 'persists the representative' do
+      described_class.civic_api_to_representative_params(geocodio_response)
+      expect(described_class.find_by(ocdid: '412345')).to be_present
+    end
+  end
 end
