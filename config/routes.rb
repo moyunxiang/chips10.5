@@ -41,4 +41,7 @@ Rails.application.routes.draw do
   delete '/representatives/:representative_id/my_news_item/:id', to: 'my_news_items#destroy'
 
   get '/search/(:address)' => 'search#search', :as => 'search_representatives'
+
+  # Routes for Bills (congress.gov API)
+  resources :bills, only: %i[index show create]
 end

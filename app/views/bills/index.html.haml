@@ -1,0 +1,17 @@
+.container.mt-4
+  %h1 Bills
+  %p.text-muted
+    Search congress.gov for bills. Leave the fields blank to see the 50 most
+    recent bills, or search by congress session and bill type.
+
+  = form_with url: bills_path, method: :get, local: true, class: 'row g-3 align-items-end mb-4' do
+    .col-auto
+      = label_tag :congress, 'Congress', class: 'form-label'
+      = number_field_tag :congress, params[:congress], class: 'form-control', placeholder: 'e.g. 118'
+    .col-auto
+      = label_tag :bill_type, 'Bill type', class: 'form-label'
+      = select_tag :bill_type,
+                   options_for_select(@bill_types, params[:bill_type]),
+                   include_blank: 'Any type', class: 'form-select'
+    .col-auto
+      = submit_tag 'Search', class: 'btn btn-primary'

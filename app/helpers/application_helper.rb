@@ -40,6 +40,10 @@ module ApplicationHelper
       {
         title: 'Search',
         link:  Rails.application.routes.url_helpers.representatives_path
+      },
+      {
+        title: 'Bills',
+        link:  Rails.application.routes.url_helpers.bills_path
       }
     ]
   end
