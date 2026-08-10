@@ -33,6 +33,37 @@ RSpec.describe Bill do
     end
   end
 
+  describe '.from_api' do
+    let(:data) do
+      { 'title' => 'A Bill', 'congress' => 118, 'number' => 7, 'type' => 'HR',
+        'originChamber' => 'House',
+        'latestAction' => { 'actionDate' => '2024-04-06', 'text' => 'Became Public Law No: 117-108.' } }
+    end
+
+    it 'maps API fields onto a transient Bill' do
+      bill = described_class.from_api(data)
+      expect(bill.title).to eq('A Bill')
+      expect(bill.type).to eq('hr')
+      expect(bill.display_number).to eq('HR 7')
+    end
+
+    it 'formats the last action with its date' do
+      bill = described_class.from_api(data)
+      expect(bill.last_action).to eq('Became Public Law No: 117-108. on Apr 6, 2024')
+    end
+  end
+
+  describe '.format_last_action' do
+    it 'returns just the text when there is no date' do
+      expect(described_class.format_last_action('Referred to committee', nil))
+        .to eq('Referred to committee')
+    end
+
+    it 'returns the text unchanged when the date is unparseable' do
+      expect(described_class.format_last_action('Something', 'not-a-date')).to eq('Something')
+    end
+  end
+
   it 'persists a record whose type column is a bill type, not an STI class' do
     bill = described_class.create!(title: 'A Test Bill', congress: 118, number: 1,
                                    type: 'hr', original_chamber: 'house', summary: 'A summary.')

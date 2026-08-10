@@ -7,11 +7,49 @@
   = form_with url: bills_path, method: :get, local: true, class: 'row g-3 align-items-end mb-4' do
     .col-auto
       = label_tag :congress, 'Congress', class: 'form-label'
-      = number_field_tag :congress, params[:congress], class: 'form-control', placeholder: 'e.g. 118'
+      = number_field_tag :congress, @congress, class: 'form-control', placeholder: 'e.g. 118'
     .col-auto
       = label_tag :bill_type, 'Bill type', class: 'form-label'
       = select_tag :bill_type,
-                   options_for_select(@bill_types, params[:bill_type]),
+                   options_for_select(@bill_types, @bill_type),
                    include_blank: 'Any type', class: 'form-select'
     .col-auto
       = submit_tag 'Search', class: 'btn btn-primary'
+
+  - if @error.present?
+    .alert.alert-warning{ role: 'alert' }= @error
+
+  - if @results.any?
+    %p.text-muted
+      Showing #{@results.size} of #{@total_count} results returned by the API.
+    .table-responsive
+      %table.table.table-striped
+        %caption.visually-hidden Bill search results
+        %thead
+          %tr
+            %th{ scope: 'col' } #
+            %th{ scope: 'col' } Title
+            %th{ scope: 'col' } Congress
+            %th{ scope: 'col' } Type
+            %th{ scope: 'col' } Chamber
+            %th{ scope: 'col' } Last Action
+            %th{ scope: 'col' } Save
+        %tbody
+          - @results.each do |bill|
+            %tr
+              %td= bill.display_number
+              %td= bill.title
+              %td= bill.congress
+              %td= Bill.label_for(bill.type)
+              %td= bill.original_chamber
+              %td= bill.last_action
+              %td
+                = form_with url: bills_path, method: :post, local: true do
+                  = hidden_field_tag 'bill[title]', bill.title
+                  = hidden_field_tag 'bill[congress]', bill.congress
+                  = hidden_field_tag 'bill[number]', bill.number
+                  = hidden_field_tag 'bill[type]', bill.type
+                  = hidden_field_tag 'bill[original_chamber]', bill.original_chamber
+                  = submit_tag 'Save', class: 'btn btn-sm btn-outline-primary'
+  - elsif @error.blank?
+    %p.text-muted No bills to show yet. Try a search above.
